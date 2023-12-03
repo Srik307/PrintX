@@ -1,0 +1,17 @@
+{
+  "name": "distributer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ezhil",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "firebase": "^10.6.0",
+    "fs": "^0.0.1-security",
+    "pdf-lib": "^1.17.1"
+  }
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 80vh;
+    }
+    .login-container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .login-container h2 {
+      text-align: center;
+    }
+    .login-form {
+      display: flex;
+      flex-direction: column;
+    }
+    .login-form input[type="text"],
+    .login-form input[type="password"],
+    .login-form input[type="button"] {
+      margin-bottom: 10px;
+      padding: 8px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+    }
+    .login-form input[type="button"] {
+      background-color:#2D8CFF;
+      color: white;
+      cursor: pointer;
+    }
+    .login-form input[type="button"]:hover {
+      background-color:#034697;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1 style="text-align: center;">Midway PrintX</h1>
+    <br>
+    <h2>Login</h2>
+    <form class="login-form" >
+      <input type="text" name="username" id="usn" placeholder="Username" required>
+      <input type="password" name="password" id="ps" placeholder="Password" required>
+      <input type="button"  onclick="log()" value="Login">
+    </form>
+  </div>
+<script src="log.js"></script>
+</body>
+</html>

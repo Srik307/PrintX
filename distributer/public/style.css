@@ -1,0 +1,94 @@
+
+    /* Optional: CSS to style the table */
+    table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+  
+      th, td {
+        border: 1px solid black;
+        padding-left: 8px;
+        padding-top: 2vh;
+        padding-right:8px;
+        padding-bottom: 2vh;
+        text-align: left;
+      }
+
+      .ryt{
+        text-align: right;
+      }
+  
+      th {
+        background-color: #f2f2f2;
+      }
+      .grn{
+        color: green;
+      }
+      .red{
+        color: red;
+      }
+      body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+  }
+  
+  #main{
+    margin-left: 220px; /* Adjust margin to accommodate the width of the sidebar */
+    padding: 16px;
+  }
+   
+  
+  .sidenav {
+    height: 100%;
+    width: 180px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color:#1E90FF;
+    overflow-x: hidden;
+    padding-top: 20px;
+  }
+  
+  .sidenav a {
+    margin-bottom: 1.7vh;
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 18px;
+    color:white;
+    font-weight: 600;
+    display: block;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  }
+  .sidenav h1 {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 20px;
+    color: white;
+    display: block;
+  }
+  
+  .sidenav a:hover {
+    background-color: black;
+  }
+  
+  #main{
+    margin-left: 220px; /* Adjust margin to accommodate the width of the sidebar */
+    padding: 16px;
+  }
+  
+  ol li{
+    text-decoration: underline;
+  }
+  
+  ol li:hover{
+    color:#1E90FF;
+  }
+
+  #view{
+    display: flex;
+    flex-direction: row;
+    gap: 30vw;
+  }
+     

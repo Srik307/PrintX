@@ -1,0 +1,47 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="style.css" rel="stylesheet"/>
+</head>
+<body>
+  <div class="sidenav">
+    <h1>Midway PrintX</h1>
+    <br>
+    <a style="background-color: black;" href="index.html" >Home</a>
+    <a  href="qrcode.html" >QR Code</a>
+    <a onclick="logout()" >Log Out</a>
+  </div>
+  <div id="main">
+    <div id="qr"></div>
+  </div>
+  <script>
+    window.addEventListener('load',async()=>{
+        var ivp;
+      fetch('/ivp').then((res)=>{
+        return res.text();
+      }).then((res)=>{
+        ivp=res;
+        console.log(ivp);
+        getQr(ivp);
+      });
+    });
+
+function getQr(x){
+    var qrcode = new QRCode(document.getElementById('qr'),x);
+}
+function logout(){
+    if(confirm('Are you sure to Logout??')){
+    localStorage.removeItem('printX');
+    window.location.replace('log.html');
+    }
+    else{
+      return;
+    }
+  }
+  </script>
+  
+</body>
+</html>
