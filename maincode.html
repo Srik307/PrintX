@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-firestore-compat.js"></script>  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>  
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.6.0/firebase-storage-compat.min.js" integrity="sha512-DqEPRRaaUFZcBa4VSyIui2nfdqrUlRvmq2RjC4NinJOwOWuvUTIzSqtbBoeTYlesZMT90vMeJpgjkRC9WJh87Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> 
+  <title>Midway PrintX</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Custom styles */
+    .navbar .nav-link {
+      color: white; /* Change to your desired color */
+    }
+    .navbar .nav-link.active,
+    .navbar .nav-link:hover {
+      color: #17a2b8 !important; /* Change to your desired active/hover color */
+    }
+    .video-container {
+  width: 80%;
+  border:1px solid white;
+  max-width: 400px; /* Adjust the maximum width as needed */
+  overflow: hidden; /* Hides any overflowing content */
+}
+.video-container video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+
+.product-card {
+  color: white;
+  background: rgba(71, 70, 70, 0.408);
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 20px;
+    }
+    .product-image {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 15px;
+    }
+    .product-price {
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+    .product-title{
+        overflow-wrap: break-word;
+    }
+    .pvdiv{
+      position: fixed;
+      z-index: 40;
+      top:1%;
+      padding: 5px;
+      color: aliceblue;
+      width: 100%;
+      height: 0%;
+      text-align: center;
+      background-color: #1D2026;
+    }
+    /*cus*/
+    tr{
+            color:whitesmoke;
+        }
+    .overf{
+            line-break: anywhere;
+        }
+
+.centered-div{
+      z-index: 20;
+      width: 100%;
+      position: absolute;
+      top: 0%;
+    }
+.modall div{
+        display: none;
+        flex-direction: row;justify-content: space-between;
+        background-color:#1D2026;
+        color: white;
+        border: 2px solid white;
+        margin: 0 3% 0 3%;
+        padding: 5px;
+    }
+    .lead{
+        opacity:0.6;
+        text-decoration: line-through;
+        font-size: smaller;
+    }
+    .list-group-item{
+      font-size:5vw;
+      padding: 0.7rem;
+      background-color:#8A94A7;
+    }
+    .coll{
+        z-index: 20;
+        width: 100%;
+        height: fit-content;
+        position: absolute;
+        top: 0%;
+        display: none;
+        flex-direction: column;justify-content: space-between;
+        background-color: #8A94A7;
+        color: white;
+        border: 2px solid white;
+        padding: 5px;
+    }
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white background */
+      z-index: 9999; /* Ensure it's above other content */
+      display: flex;
+      display: none;
+      justify-content: center;
+      align-items: center; /* Initially hidden */
+      transition: opacity 0.3s ease-in-out; /* Smooth transition */
+    }
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+      border-width: 0.3em;
+    }
+  ol li div{
+    font-size: 1rem; 
+  }
+
+  #cartcont{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-wrap:wrap;
+    background-color: #8A94A7;
+    padding-left: 5%;
+  }
+
+  #cartcont span{
+    width: fit-content;
+    color: white;
+    margin:0.1rem;
+    font-size: 0.8rem;
+  }
+  .rows{
+            margin-top: 0.5rem;
+            display: flex;
+            flex-direction: row;
+            gap: 3%;
+        }
+  .mainst{
+           color: white;
+            width: fit-content;
+            margin-left: 10%;
+            margin-bottom: 5vh;
+        }
+</style>
+
+</head>
+<body style="background-color:#1D2026;">
+<div class="container">
+        <div class="loading-overlay" id="loadingOverlay">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only"></span>
+          </div>
+        </div>
+</div>
+<div class="centered-div" id="cent">
+    <center><div id="titt"></div><div id="id">
+    </div></center>
+    <center><div style="display: none;margin-left: 5px;margin-right: 5px;background-color: white;" id="instruct" ><span class="h6">Below is the Payment QR code<br> Please do the payment before the slot timing<br>
+        Your order will not be taken if not paid
+        <br>Please don't pay any extra amounts then the bill amount</span></div></center><br>
+        <div class="container mb-1">
+            <center><div id='qr' style="display: none;width: 80%;height: 80%;"></div></center></div>
+    <div class="modall">
+    <div id="al"></div></div>
+    <div style="width: 100%;background-color:#8A94A7;">
+    <div id="cartcont"></div></div>
+    <div id="bot"></div>
+</div>
+</div>
+<div id="main">
+<div id="titdiv" style="margin-top: 5vh;color:whitesmoke;margin-bottom: 8vh;margin-left: 18%;">
+        <h2 style="font-weight:700;font-size:2.2rem;">Midway PrintX</h2>
+    </div>
+    <div class="mainst" id="mainstat">
+    </div>
+    <div>
+    <div class="center" style="text-align: center;color:#8A94A7;margin-left:5em;margin-right: 5em;margin-top: 5vh;">
+        <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;font-size:1rem;">Powered by<br><a>SGS Xerox (Cit-Campus)</a></h5>
+    </div>
+</div>
+</div>
+<br>
+<br>
+<br>
+<br>
+<nav class="navbar fixed-bottom navbar-dark bg-dark d-block d-md-none mb-5">
+    <div class="row mb-1">
+      <div class="col">
+        <a class="nav-link text-center" onclick="manager('stat')">
+          <i class="fas fa-home"></i>
+        </a>
+      </div>
+      <div class="col">
+        <a class="nav-link text-center" onclick="dilema()">
+          <i class="fas fa-shopping-cart"></i>
+        </a>
+      </div>
+      <div class="col">
+        <a class="nav-link text-center" onclick="predataFill()">
+            <i class="fas fa-id-card"></i>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+
+
+  
+
+<!-- Bootstrap and Font Awesome JS -->
+
+
+<script>
+
+/*
+Functions
+
+dilema
+manager
+libtocart
+showLoading
+hideLoading
+Add
+RemoveP
+editcart
+custocart
+
+=>Noteslib
+searchit
+createList
+add
+unadd
+
+=>customfiles script
+del
+countpg
+createFileList
+addTable
+cuscart
+stor1
+stor2
+stor3
+
+
+=>Cart script
+cartopen
+displayh
+
+=>Maincode
+
+wattxt
+predataFill
+createZip
+fillOrdData
+nextdate
+Alert
+validate
+takeord
+downloadinvoice
+generateQR
+Ddownload
+placeord
+
+*/
+
+//variables
+/*
+
+var cusToCart={};
+var ordernotes={};
+var cartOrders=[];
+var personsCust=[];
+var mainstor={
+    'p1':{
+        'cus':{},
+        'nlib':[],
+        'wat':""
+    }
+};
+const oth=['@a1','@b2','@c3','@d4','@e5'];
+var pagy;
+
+var personP=1;
+const rate=1.15;
+
+var ordData={'l':{}};
+var totpg=0,totpr=0,totsize=0;
+var cartcont;
+
+var deltym;
+var mail,nam,ph;
+var dis=0;
+const charc=['A',"B","C","D","E","F","G","H","I","J","K","L"];
+const upi="mr.srik307@okhdfcbank";
+var mainstorkeys=['p1'];
+var curpers='p1';
+*/
+
+var cusToCart={};
+var ordernotes={};
+var cartOrders=[];
+var personsCust=[];
+var mainstor={
+    'p1':{
+        'cus':{},
+        'nlib':[],
+        'wat':""
+    }
+};
+var pagy;
+
+var personP=1;
+const rate=1.05;
+
+var ordData={'l':{}};
+var totpg=0,totpr=0,totsize=0;
+var cartcont;
+
+var deltym;
+var mail,nam,ph;
+var dis=0;
+
+const upi="mr.srik307@okhdfcbank";
+
+var mainstorkeys=['p1'];
+var curpers='p1';
+var db;
+var slots={}
+var todaydate;
+var date,month,yr;
+var slottxt=[];
+
+const pghtml={
+'stat':[`<div id="titdiv" style="margin-top: 5vh;color:whitesmoke;margin-bottom: 10vh;margin-left: 20%;">
+        <h2 style="font-weight:700;font-size:2.2rem;">Midway PrintX</h2>
+    </div>
+    <div class="mainst" id="mainstat">
+    </div>
+    <div>
+    <div class="center" style="text-align: center;color:#8A94A7;margin-left:5em;margin-right: 5em;margin-top: 10vh;">
+        <h5 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;font-size:1rem;">Powered by<br><a>SGS Xerox (Cit-Campus)</a></h5>
+    </div>
+</div>`],
+//home
+'home':[`
+<div>
+    <div>
+        <div id="titdiv" style="margin-top: 20vh;color:whitesmoke;margin-bottom: 5vh;">
+                <h4 id='tith' style="font-weight:700;text-align:center;font-size:1.3rem;"></h4>
+                </div>
+                <div style="width:90%;margin: 10vh auto 5vh auto;text-align: center;">
+                    <button class="btn btn-primary p-2  mb-3" style="width:50vw;font: size 1em;" onclick="manager('lib')">Notes Library</button>
+                    <button class="btn btn-outline-primary p-2  mt-3" style="width:50vw;font: size 1em;" onclick="manager('cus')">Custom Files</button>
+                </div>
+                <div class="center" style="text-align: center;color:#8A94A7;margin-left:5em;margin-right: 5em;margin-top:10vh">
+                    <h4 style="font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;font-size:1rem;">Powered by <br><a>SGS Xerox (Cit-Campus)</a></h5>
+                </div>
+            </div>
+        </div>`],
+//lib
+'lib':[`
+</div>
+<div class="container mt-4" style="color: whitesmoke;">
+  <div class="row mb-4 ml" style="align-items: center;">
+    <div class="col-9"><span class="mb-4 h4" style="font-weight: 800;">PrintX Notes Library</span></div>
+    <div><span class="btn btn-info ml-3" id="cartbtn" onclick="libtocart()">Cart</span></div></div>
+    <input type="text" class="form-control" id="searchtxt" onkeyup="searchit()" style="background:transparent;color: aliceblue;" placeholder="Search"/>
+<div class="row-12 mt-4" id="maincol">
+<p style="opacity: 0.5;padding: 3%;margin-top:8vh;text-align:center;">Welcome to PrintX notes library, the notes in this library are collected from various sources,please preview what ever you choose before ordering</p>
+</div>
+</div>`],
+//cus
+'cus':[`<div class="container mt-5" style="color:white;">
+<h3>Custom Files</h3>
+<p>Pdf format only</p>
+<div id="persons1" class='mt-5'>
+        <input type="file" id="fileInput1" accept="application/pdf" class="form-control " onchange="createFileList(this)"  multiple>
+        <br>     
+            <table  class="table">
+                    <thead><tr><th>Name</th><th>Pages</th><th>Price</th><th>Side</th></tr></thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+</div>
+</div>`],
+//cart
+'cart':[`<div class="container mt-4" style="color:white">
+<h3>Cart</h3>
+<div id="cartmainList" class="mb-2">
+</div>
+<div><button class="btn btn-info w-100 mt-3" onclick="predataFill()">Proceed</button></div>
+</div><br><br>`],
+//contact
+'contact':[`   
+<div class="container" style="color:white">
+<div class="form-input mb-3 mt-3">
+    <h3>Contact Details</h3>
+    <label class="form-input-label mt-2" for="form-control">
+    Your Name:        
+    </label>
+<input type="text" id="usn" class="form-control" required/>
+</div>
+<div class="form-input mb-3">
+    <label class="form-input-label" for="form-control" >
+        Clg Email:       
+    </label>
+    <input type="email" id="mail"  class="form-control" required/>
+</div>
+<div class="form-input mb-5">
+<label class="form-input-label" for="form-control" >
+    Mob No(whatsapp):        
+</label>
+<input type="number" id="ph" class="form-control" required/>
+</div>
+<button class="btn btn-info" onclick="validate()">Proceed</button>
+</div>`],
+//success
+}
+
+var limits=[200,100,50,100];
+
+var datobj;
+
+function slotst(){
+document.getElementById('loadingOverlay').style.display="flex";
+  datobj=new Date();
+   date=datobj.getDate();
+   month=datobj.getMonth()+1;
+   yr=datobj.getFullYear();
+    const firebaseConfig = {
+      apiKey: "AIzaSyDZrfD2n19_UN8vbV13MsgZ7mgCqvJGZgI",
+      authDomain: "midwayprintx.firebaseapp.com",
+      projectId: "midwayprintx",
+      storageBucket: "midwayprintx.appspot.com",
+      messagingSenderId: "167337763792",
+      appId: "1:167337763792:web:79949d5c6e08c5082a4fd5"
+    };
+    const firebaseApp1 = firebase.initializeApp(firebaseConfig);
+    db=firebaseApp1.firestore();
+    db.collection('spList').doc(`${date}-${month}-${yr}`).get().then(res=>{
+        slots[`${date}`]=res.data();
+        db.collection('spList').doc(`${date+1}-${month}-${yr}`).get().then(res=>{
+            slots[`${date+1}`]=res.data();
+            db.collection('spList').doc(`${date+2}-${month}-${yr}`).get().then(res=>{
+                slots[`${date+2}`]=res.data();
+                fillstatus();
+            });
+        });
+
+    });
+}
+
+slotst();
+
+function slotset(x,y,z){
+    x=`${x}-${month}-${yr}`;
+    slottxt=[x,y,z];
+    manager('home');
+}
+
+
+function getstr(x,date){
+    if(x==undefined){
+        return `<button class='btn btn-outline-dark' >Shop leave</button>`
+    }
+    if(x['h']!=undefined){
+        return `<button class='btn btn-outline-dark' >Shop leave</button>`
+    }
+    str='';
+    if(x['s1']<limits[0] && !(datobj.getHours()>18 && date==datobj.getDate()+1)){
+        if(date==datobj.getDate()){str=str+`<button class='btn btn-outline-dark'>morn</button>`}
+        else{
+        if(x['s1']>limits[0]/2){
+        str=str+`<button class='btn btn-outline-warning' onclick="slotset('${date}','morn','s1')">morn</button>`
+        }
+        else{
+       str=str+`<button class='btn btn-outline-success' onclick="slotset('${date}','morn','s1')">morn</button>`    
+        }
+    }
+    }
+    else{
+        str=str+`<button class='btn btn-outline-dark'>morn</button>`  
+    }
+    if(x['s2']<limits[1] && !(datobj.getHours()>8 && date==datobj.getDate())){
+        if(x['s2']>limits[1]/2){
+        str=str+`<button class='btn btn-outline-warning' onclick="slotset('${date}','break','s2')">break</button>`
+        }
+        else{
+       str=str+`<button class='btn btn-outline-success' onclick="slotset('${date}','break','s2')">break</button>`    
+        }  
+    }
+    else{
+        str=str+`<button class='btn btn-outline-dark'>break</button>`  
+    }
+    if(x['s3']<limits[2] && !(datobj.getHours()>10.5 && date==datobj.getDate())){
+        if(x['s3']>limits[2]/2){
+        str=str+`<button class='btn btn-outline-warning' onclick="slotset('${date}','lunch','s3')">lunch</button>`
+        }
+        else{
+       str=str+`<button class='btn btn-outline-success' onclick="slotset('${date}','lunch','s3')">lunch</button>`    
+        }  
+    }
+    else{
+        str=str+`<button class='btn btn-outline-dark'>lunch</button>`  
+    }
+    if(x['s4']<limits[3] && !(datobj.getHours()>13 && date==datobj.getDate())){
+        if(x['s4']>limits[3]/2){
+        str=str+`<button class='btn btn-outline-warning' onclick="slotset('${date}','Evening','s4')">Evening</button>`
+        }
+        else{
+       str=str+`<button class='btn btn-outline-success' onclick="slotset('${date}','Evening','s4')">Evening</button>`    
+        }  
+    }
+    else{
+        str=str+`<button class='btn btn-outline-dark'>Evening</button>`  
+    }
+    return str;
+}
+
+function fillstatus(){
+    var str=`
+        <span>${date}/${month}/${yr}</span>
+        <div class="rows">`
+    str=str+getstr(slots[date],date);
+    str=str+`</div>
+        <br>
+        <span>${date+1}/${month}/${yr}</span>
+        <div class="rows">`;
+    str=str+getstr(slots[date+1],date+1);
+    str=str+`
+        </div>
+        <br>
+        <span>${date+2}/${month}/${yr}</span>
+        <div class="rows">`
+    str=str+getstr(slots[date+2],date+2);
+    str=str+`</div><br>`;
+    document.getElementById('loadingOverlay').style.display="none";
+    document.getElementById('mainstat').innerHTML=str;
+}
+
+
+
+
+function dilema(){
+    if(pagy==='lib'){
+        libtocart();
+        return
+    }
+    if(pagy==="cus"){
+        custocart();
+        return;
+    }
+    manager('cart');
+    cartopen();
+}
+
+
+
+
+function manager(page,curper){
+    if(curper!=undefined){curpers=curper;
+    if(page==='lib'){
+        cartOrders=mainstor[curper]['nlib'];
+    }}
+   if(page=="cus"){
+            if(window.navigator.userAgent.search("Windows")!==-1 || window.navigator.userAgent.search("Mac")!==-1){
+            Alert("Custom files option is not supported in large screens");
+        return;}
+    }
+    pagy=page;
+    document.getElementById('main').innerHTML=pghtml[page];
+    if(page=="stat"){
+        slotst();
+    }
+    if(page=="home"){
+    document.getElementById('tith').textContent=`${slottxt[0]} , Slot- ${slottxt[1]}`;
+    }
+    if(page==='lib'){
+    createList(Object.keys(notesobj))
+    }
+}
+
+function libtocart(){
+Object.keys(ordernotes).forEach(i=>cartOrders.push({'n':ordernotes[i]['n'],'sid':ordernotes[i]['c'],'p':ordernotes[i]['p'],'pg':ordernotes[i]['pg']}));
+    ////console.log(cartOrders);
+mainstor[curpers]['nlib']=cartOrders;
+//console.log(mainstor);
+Object.keys(notesobj).forEach((i)=>{
+    notesobj[i]['a']=false;
+    notesobj[i]['pv']=false;
+});
+cartOrders=[];
+ordernotes={};
+manager('cart');
+cartopen();
+}
+
+
+
+
+
+function editcart(info,ind,per,elid){
+    if(info==="lib"){
+        mainstor[per]['nlib'][ind]=undefined;
+        //console.log("hello");
+    }
+    if(info==="cus"){
+        mainstor[per]['cus']=undefined;
+    }
+    document.getElementById(elid).remove();
+    //console.log(mainstor);
+}
+
+
+function custocart(){
+   mainstor[curpers]['cus']=cusToCart;
+   cusToCart={};
+   manager('cart');
+   cartopen();
+}
+
+
+
+
+
+//notes library script
+const notesobj={
+    "Physics UPC Planner": {
+        "n": "Physics UPC Planner",
+        "pg": 2,
+        "c": 1,
+        "p": 5,
+        "a": false,
+        "s": "S"
+    },
+    "Chemistry UPC Planner": {
+        "n": "Chemistry UPC Planner",
+        "pg": 2,
+        "c": 2,
+        "p": 5,
+        "a": false,
+        "s": "S"
+    },
+    "Maths UPC Planner": {
+        "n": "Maths UPC Planner",
+        "pg": 5,
+        "c": 3,
+        "p": 11,
+        "a": false,
+        "s": "S"
+    },
+    "CPP UPC Planner": {
+        "n": "CPP UPC Planner",
+        "pg": 2,
+        "c": 4,
+        "p": 5,
+        "a": false,
+        "s": "S"
+    },
+    "PSC UPC Planner": {
+        "n": "PSC UPC Planner",
+        "pg": 2,
+        "c": 5,
+        "p": 5,
+        "a": false,
+        "s": "S"
+    },
+    "ADP UPC Planner": {
+        "n": "ADP UPC Planner",
+        "pg": 2,
+        "c": 6,
+        "p": 5,
+        "a": false,
+        "s": "S"
+    },
+    "EDC UPC Planner": {
+        "n": "EDC UPC Planner",
+        "pg": 2,
+        "c": 7,
+        "p": 5,
+        "a": false,
+        "s": "S"
+    },
+    "English UPC Planner": {
+        "n": "English UPC Planner",
+        "pg": 6,
+        "c": 8,
+        "p": 13,
+        "a": false,
+        "s": "S"
+    },
+    "AI UPC Planner": {
+        "n": "AI UPC Planner",
+        "pg": 2,
+        "c": 9,
+        "p": 5,
+        "a": false,
+        "s": "S"
+    },
+    "Cpp(unit-5).pdf": {
+        "n": "Cpp(unit-5)",
+        "pg": 12,
+        "c": 10,
+        "p": 13,
+        "a": false,
+        "s": "D"
+    },
+    "AptitudeUnit 5.pdf": {
+        "pg": 14,
+        "c": 11,
+        "a": false,
+        "p": 15,
+        "n": "AptitudeUnit 5",
+        "s": "D"
+    },
+    "CommunicativeEng(unit-2,3).pdf": {
+        "n": "CommunicativeEng(unit-2,3)",
+        "pg": 14,
+        "c": 12,
+        "p": 15,
+        "a": false,
+        "s": "D"
+    },
+    "CommunicativeEng(unit-4,5).pdf": {
+        "n": "CommunicativeEng(unit-4,5)",
+        "pg": 14,
+        "c": 13,
+        "p": 15,
+        "a": false,
+        "s": "D"
+    },
+    "Physics(unit-3).pdf": {
+        "n": "Physics(unit-3)",
+        "pg": 16,
+        "c": 14,
+        "p": 17,
+        "a": false,
+        "s": "D"
+    },
+    "Cpp(unit-4).pdf": {
+        "n": "Cpp(unit-4)",
+        "pg": 18,
+        "c": 15,
+        "p": 19,
+        "a": false,
+        "s": "D"
+    },
+    "Physics(unit-2).pdf": {
+        "n": "Physics(unit-2)",
+        "pg": 18,
+        "c": 16,
+        "p": 19,
+        "a": false,
+        "s": "D"
+    },
+    "PSC(unit-5).pdf": {
+        "n": "PSC(unit-5)",
+        "pg": 18,
+        "c": 17,
+        "p": 19,
+        "a": false,
+        "s": "D"
+    },
+    "Physics(unit-1).pdf": {
+        "n": "Physics(unit-1)",
+        "pg": 20,
+        "c": 18,
+        "p": 21,
+        "a": false,
+        "s": "D"
+    },
+    "PSC(unit-2).pdf": {
+        "n": "PSC(unit-2)",
+        "pg": 20,
+        "c": 19,
+        "p": 21,
+        "a": false,
+        "s": "D"
+    },
+    "Chemistry(unit-4).pdf": {
+        "n": "Chemistry(unit-4)",
+        "pg": 20,
+        "c": 20,
+        "p": 21,
+        "a": false,
+        "s": "D"
+    },
+    "CommunicativeEng(unit-1).pdf": {
+        "n": "CommunicativeEng(unit-1)",
+        "pg": 21,
+        "c": 21,
+        "p": 23,
+        "a": false,
+        "s": "D"
+    },
+    "ADPunit-4(DOM).pdf": {
+        "n": "ADPunit-4(DOM)",
+        "pg": 22,
+        "c": 22,
+        "p": 23,
+        "a": false,
+        "s": "D"
+    },
+    "Chemistry(unit-2).pdf": {
+        "n": "Chemistry(unit-2)",
+        "pg": 24,
+        "c": 23,
+        "p": 25,
+        "a": false,
+        "s": "D"
+    },
+    "PSC(unit-3).pdf": {
+        "n": "PSC(unit-3)",
+        "pg": 22,
+        "c": 24,
+        "p": 23,
+        "a": false,
+        "s": "D"
+    },
+    "ADPunit-5.pdf": {
+        "n": "ADPunit-5",
+        "pg": 22,
+        "c": 25,
+        "p": 23,
+        "a": false,
+        "s": "D"
+    },
+    "Chemistry(unit-1).pdf": {
+        "n": "Chemistry(unit-1)",
+        "pg": 24,
+        "c": 26,
+        "p": 25,
+        "a": false,
+        "s": "D"
+    },
+    "Cpp(unit-2).pdf": {
+        "n": "Cpp(unit-2)",
+        "pg": 26,
+        "c": 27,
+        "p": 27,
+        "a": false,
+        "s": "D"
+    },
+    "Chemistry(unit-5).pdf": {
+        "n": "Chemistry(unit-5)",
+        "pg": 28,
+        "c": 28,
+        "p": 29,
+        "a": false,
+        "s": "D"
+    },
+    "AptitudeUnit 4.pdf": {
+        "pg": 29,
+        "c": 29,
+        "a": false,
+        "p": 31,
+        "n": "AptitudeUnit 4",
+        "s": "D"
+    },
+    "Physics(unit-4,5).pdf": {
+        "n": "Physics(unit-4,5)",
+        "pg": 30,
+        "c": 30,
+        "p": 31,
+        "a": false,
+        "s": "D"
+    },
+    "ADPunit-1(html).pdf": {
+        "n": "ADPunit-1(html)",
+        "pg": 32,
+        "c": 31,
+        "p": 33,
+        "a": false,
+        "s": "D"
+    },
+    "Chemistry(unit-3).pdf": {
+        "n": "Chemistry(unit-3)",
+        "pg": 32,
+        "c": 32,
+        "p": 33,
+        "a": false,
+        "s": "D"
+    },
+    "AptitudeUnit 2.pdf": {
+        "pg": 33,
+        "c": 33,
+        "a": false,
+        "p": 35,
+        "n": "AptitudeUnit 2",
+        "s": "D"
+    },
+    "ADPunit-3(javascript).pdf": {
+        "n": "ADPunit-3(javascript)",
+        "pg": 34,
+        "c": 34,
+        "p": 35,
+        "a": false,
+        "s": "D"
+    },
+    "Cpp(unit-3).pdf": {
+        "n": "Cpp(unit-3)",
+        "pg": 34,
+        "c": 35,
+        "p": 35,
+        "a": false,
+        "s": "D"
+    },
+    "PSC(unit-1).pdf": {
+        "n": "PSC(unit-1)",
+        "pg": 34,
+        "c": 36,
+        "p": 35,
+        "a": false,
+        "s": "D"
+    },
+    "PSC(unit-4).pdf": {
+        "n": "PSC(unit-4)",
+        "pg": 34,
+        "c": 37,
+        "p": 35,
+        "a": false,
+        "s": "D"
+    },
+    "AptitudeUnit 1.pdf": {
+        "n": "AptitudeUnit 1",
+        "pg": 40,
+        "c": 38,
+        "p": 41,
+        "a": false,
+        "s": "D"
+    },
+    "ADPunit-2(css).pdf": {
+        "n": "ADPunit-2(css)",
+        "pg": 40,
+        "c": 39,
+        "p": 41,
+        "a": false,
+        "s": "D"
+    },
+    "Matrices&Algebra(unit-4).pdf": {
+        "n": "Matrices&Algebra(unit-4)",
+        "pg": 42,
+        "c": 40,
+        "p": 43,
+        "a": false,
+        "s": "D"
+    },
+    "Cpp(unit-1).pdf": {
+        "n": "Cpp(unit-1)",
+        "pg": 44,
+        "c": 41,
+        "p": 45,
+        "a": false,
+        "s": "D"
+    },
+    "Matrices&Algebra(unit-5).pdf": {
+        "n": "Matrices&Algebra(unit-5)",
+        "pg": 46,
+        "c": 42,
+        "p": 47,
+        "a": false,
+        "s": "D"
+    },
+    "Matrices&Algebra(unit-2).pdf": {
+        "n": "Matrices&Algebra(unit-2)",
+        "pg": 50,
+        "c": 43,
+        "p": 51,
+        "a": false,
+        "s": "D"
+    },
+    "Matrices&Algebra(unit-1).pdf": {
+        "n": "Matrices&Algebra(unit-1)",
+        "pg": 50,
+        "c": 44,
+        "p": 51,
+        "a": false,
+        "s": "D"
+    },
+    "Matrices&Algebra(unit-3).pdf": {
+        "n": "Matrices&Algebra(unit-3)",
+        "pg": 62,
+        "c": 45,
+        "p": 63,
+        "a": false,
+        "s": "D"
+    },
+    "Physics full units": {
+        "n": "Physics full units",
+        "pg": 84,
+        "c": 46,
+        "p": 85,
+        "a": false,
+        "s": "D"
+    },
+    "Cpp full": {
+        "n": "Cpp full units",
+        "pg": 134,
+        "c": 47,
+        "p": 135,
+        "a": false,
+        "s": "D"
+    },
+    "AI unit-1": {
+        "n": "AI unit-1",
+        "pg": 24,
+        "c": 48,
+        "p": 25,
+        "a": false,
+        "s": "D"
+    },
+    "AI unit-2": {
+        "n": "AI unit-2",
+        "pg": 24,
+        "c": 49,
+        "p": 25,
+        "a": false,
+        "s": "D"
+    },
+    "AI unit-3": {
+        "n": "AI unit-3",
+        "pg": 20,
+        "c": 50,
+        "p": 21,
+        "a": false,
+        "s": "D"
+    },
+    "AI unit-4": {
+        "n": "AI unit-4",
+        "pg": 30,
+        "c": 51,
+        "p": 31,
+        "a": false,
+        "s": "D"
+    }
+}
+
+
+
+function searchit(){
+    var txt=document.getElementById("searchtxt").value;
+    txt=(txt.toUpperCase()).trim();
+    txt=txt.replace(/[&-\/\ \#,+()$~%.'":*?<>{}]/g,'');
+    var tempobj=Object.keys(notesobj);
+    tempobj=tempobj.filter(i=>  (i.toUpperCase()).indexOf(txt)!=-1);
+    if(txt==='' || txt===' ')
+    {createList(Object.keys(ordernotes))}
+    else{
+    createList(tempobj);}
+}
+
+
+function createList(list){
+    st=''
+    list.forEach(el => {
+        st=st+` <div class="product-card">
+        <div class="row">
+        <div class="col-8">
+      <h5 class="product-title">${notesobj[el]['n']}</h5>
+      <p class="product-price">₹ ${notesobj[el]['p']}</p></div>
+      <div class="col-4">
+        <span id="addbtn${el}">`;
+        if(notesobj[el]['a']){st=st+`<button class="btn btn-info w-100"  onclick="unadd('${el}')">Added</button>`;}
+        else{st=st+`<button class="btn btn-outline-info w-100" onclick="add('${el}')">Add</button>`;}
+    st=st+`</span></div>
+    </div>
+    </div>`
+    });
+    if(list.length===Object.keys(ordernotes).length){st=st+`<button class="btn btn-info" onclick="libtocart()" style="width:80%;margin: 5vh 10% 5vh 10%;">Go to Cart &RightArrow;</button>`}
+    document.getElementById('maincol').innerHTML=st;
+}
+
+
+function add(objx){
+    notesobj[objx]['a']=true;
+    ordernotes[objx]=notesobj[objx];
+    //console.log(ordernotes);
+    document.getElementById('addbtn'+objx).innerHTML=`<button class="btn btn-info w-100"  onclick="unadd('${objx}')">Added</button>`;
+    if(Object.keys(ordernotes).length>0){document.getElementById('cartbtn').style.display="block";}
+}
+
+function unadd(objx){
+    notesobj[objx]['pv']=false
+    //console.log("unadded");
+    notesobj[objx]['a']=false;
+    notesobj[objx]['pv']=false;
+    delete ordernotes[objx];
+    //console.log(ordernotes);
+    document.getElementById('addbtn'+objx).innerHTML=`<button class="btn btn-outline-info w-100" onclick="add('${objx}')">Add</button>`
+    if(Object.keys(ordernotes).length==0){document.getElementById('cartbtn').style.display="none";}
+}
+
+
+//
+
+
+
+
+//customfiles script
+function del(elid,info,ind){
+    //console.log(document.getElementById(elid));
+    if(elid==='tbody'){document.getElementById(elid).innerHTML="";return}
+    document.getElementById(elid).remove();
+}
+
+
+
+function countpg(file){
+    return new Promise((r,rj)=>{
+    const fileReader = new FileReader(); 
+    fileReader.readAsArrayBuffer(file);
+    fileReader.onload = function(){
+    const typedArray = new Uint8Array(this.result);
+    pdfjsLib.getDocument(typedArray).promise.then(function(pdf) {
+        //console.log(pdf.numPages);
+        r(pdf.numPages);
+    })
+}
+    });
+}
+var files;
+var count;
+function createFileList(e){
+    if(e.files.length>21){
+        Alert("Cannot Upload more than 20 files!!");e.value="";return
+    }
+    if(e.files.length===0){del('tbody');return}
+    //console.log(e.files.length);
+     count=[];
+    cusToCart['files']=[];
+    files=e.files
+    temp=[];
+    Object.keys(files).forEach(async (el) => {
+        if(files[el].size>(100*1024*1024)){
+            Alert("File size must be less than 100mb - "+files[el].name);
+            e.value="";del('tbody');
+            return;
+        }
+        if(temp.indexOf(files[el].name)!=-1){Alert("Please do not use same name files!!");e.value="";del('tbody');return}else{
+        temp.push(files[el].name);}
+        var c=await countpg(files[el])
+        count.push(c);
+        cusToCart['files'].push([files[el],[c,"D"]]);
+        addTable();
+    });
+}
+var sum=0,pgsum=0,size=0;
+cusToCart['files']=[];
+function addTable(){
+    str='';sum=0;pgsum=0,size=0;
+    for(let i=0;i<count.length;i++){
+        var curpr;
+        size=size+files[i+''].size;
+        pgsum=pgsum+count[i];
+        if(cusToCart['files'][i][1][1]=="S"){
+            if(count[i]>3){
+                curpr=Math.ceil(count[i]*2)+1;}
+                else{
+                    curpr=Math.ceil(count[i]*2);   
+                }
+                console.log(sum);  
+            }
+            else{
+                if(count[i]>3){
+                curpr=Math.ceil(count[i]*rate);}
+                else{
+                    curpr=Math.ceil(count[i]*1);   
+                }
+            }
+        curpr=count[i]%2==0?curpr:curpr+1;
+        sum=sum+curpr;
+        console.log(cusToCart['files']);
+        str=str+`
+        <tr id="tbrow${i+1}"><td class="overf">${files[(i)+''].name}</td><td>${count[i]}</td><td>${curpr}</td><td><button class='btn btn-outline-info' onclick="changeS(${i})">${cusToCart['files'][i][1][1]}</button></td></tr>`
+    }
+    str=str+`<tr><td><h4>Total -</h4></td><td>${pgsum}</td><td>${sum}</td><td></td></tr>`;
+    //console.log(str);
+    document.getElementById('tbody').innerHTML=str+`
+    <div class="btn btn-info" onclick="cuscart()">Go to Cart</div>`;
+}
+
+function changeS(z){
+    if(cusToCart['files'][z][1][1]=="D"){
+        cusToCart['files'][z][1][1]="S";}
+    else{
+        cusToCart['files'][z][1][1]="D";  
+    }
+        addTable();
+}
+
+function cuscart(){
+    const docus=document.getElementById('fileInput1').files;
+        cusToCart['p']=sum;
+        cusToCart['pg']=pgsum;
+        cusToCart['sz']=size;
+    custocart();
+}
+
+
+
+
+
+//cart script
+
+//window.onload=show();
+
+function cartopen(per){
+    str=''
+    mainstorkeys.forEach(key=>{
+        ind=mainstorkeys.indexOf(key)+1;
+        if(ind<=personP){
+        str=str+
+        `<div id="ordersList${ind}" class="mt-5">
+        <div class="personsdiv">
+        <div class="row mb-4 " style="align-items: center;">
+        </div>
+            <div class="row-12 mt-4" id="maincol">`;
+    if(mainstor[key]['nlib'].length!=0){
+    //console.log(mainstor[key]['nlib']);
+    mainstor[key]['nlib'].forEach(el=>{
+    if(el!=undefined){
+    str=str+`
+    <div class="product-card" id="${el['sid']}${key}">
+        <div class="row">
+        <div class="col-8">
+      <h5 class="product-title">${el['n']}</h5></div>
+      <div class="col-4">
+        <span class="mr-2">₹${el['p']}</span>
+        <i class="fas fa-minus-circle rounded-icon ml-2" onclick="editcart('lib','${mainstor[key]['nlib'].indexOf(el)}','${key}','${el['sid']}${key}')"></i>
+      </div>
+    </div></div>`
+}
+    });
+}
+    if(mainstor[key]['cus']!=undefined && mainstor[key]['cus']['pg']!=undefined ){
+        str=str+`
+        <div class="product-card" id="${key}cus">
+            <div class="row">
+            <div class="col-8">
+          <h5 class="product-title">Custom Files(pages-${mainstor[key]['cus']['pg']})</h5></div>
+          <div class="col-4">
+            <span class="mr-2">₹${mainstor[key]['cus']['p']}</span>
+            <i class="fas fa-minus-circle rounded-icon ml-2" onclick="editcart('cus','','${key}','${key}cus')""></i>
+          </div>
+        </div></div>`;
+}
+str=str+`<span class='btn btn-outline-info' onclick="displayh('${key}addmore')">Add Notes</span>
+</div>
+<div style="display:none" id="${key}addmore">
+<span class='btn btn-info mt-2' onclick="manager('lib','${key}')">Notes Library</span>
+<span class='btn btn-outline-info mt-2' onclick="manager('cus','${key}')">Custom Files</span>
+</div></div>`;
+}
+});
+document.getElementById('cartmainList').innerHTML=str;
+}
+
+
+function displayh(per){
+    document.getElementById(per).style.display='block';
+    setTimeout(()=>{
+        if(document.getElementById(per)!=undefined){
+        document.getElementById(per).style.display='none'; }  
+    },5000);
+}
+
+//main code
+var msgtext='';
+var cusfiles=[];
+
+
+
+
+function predataFill(){
+    cartcont='';
+    totpg=0,totpr=0;totsize=0;
+    mainstorkeys.forEach((i)=>{
+        if(mainstor[i]['nlib'].length!=0){
+            mainstor[i]['nlib'].forEach((e)=>{
+                if(e!=undefined){
+                totpg=totpg+e['pg'];
+                totpr=totpr+e['p'];
+                cartcont=cartcont+`<span >${e['n']}</span>`;}
+    });
+}
+cartcont=cartcont;
+    if(mainstor[i]['cus']!=undefined && Object.entries(mainstor[i]['cus']).length != 0){
+        totpg=totpg+mainstor[i]['cus']['pg'];
+        totpr=totpr+mainstor[i]['cus']['p'];
+        totsize=totsize+(mainstor[i]['cus']['sz']/(1024*1024));
+        const files=mainstor[i]['cus']['files'];
+        console.log(mainstor[i]['cus']['files']);
+        for(let y=0;y<files.length;y++){
+            cartcont=cartcont+`<span >${files[y][0].name}</span>`;
+            msgtext=msgtext+`${y+1}.${files[y][0].name}\n`;
+            cusfiles.push({[files[y][0].name]:files[y][1]});
+        }
+        console.log(cusfiles);
+    }
+});
+//console.log(mainstor);
+manager('contact');
+}
+
+
+function createZip(){
+    finalpg();
+    var whatsapplink;
+     whatsapplink=`https://wa.me/919840479682?text=`+encodeURIComponent(`Midway Services-SGS PrintX\n\nOrder Id-${ordData['id']}\n\nCustom Files\n\n${msgtext}`);
+    window.open(whatsapplink,'_blank');
+}
+
+
+
+
+
+
+function fillOrdData(){
+    mainstorkeys.forEach((i)=>{
+        arr=[]
+        if(mainstor[i]['nlib'].length!=0){
+        mainstor[i]['nlib'].forEach((e)=>{
+            if(e!=undefined){
+            //console.log(e,"kd");
+           arr.push(e['sid']);}
+        });
+    }
+    //console.log(ordData,"lib",othnames);
+    if(i=="p1"){
+    ordData['l']=arr;}
+    });
+    ordData['c']=cusfiles;
+    ordData['pg']=totpg;
+    ordData['pr']=totpr;
+    ordData['pay']=false;
+    placeord();
+}
+
+var udb;
+
+function nextdate(){
+    return new Promise((r,rj)=>{
+    if(isNaN(totsize) && isNaN(totpg)){totsize=0;totpg=0}
+    const f2={
+      apiKey: "AIzaSyDrTP2lnqThtyLBrmlJDuanNQIyAazl35o",
+      authDomain: "users-db-dbf93.firebaseapp.com",
+      projectId: "users-db-dbf93",
+      storageBucket: "users-db-dbf93.appspot.com",
+      messagingSenderId: "487192438208",
+      appId: "1:487192438208:web:cf522c42700398416f1425"
+    };
+     const firebaseApp1 = firebase.initializeApp(f2,'1');
+      udb = firebaseApp1.firestore();
+      db.collection('spList').doc(slottxt[0]).get().then((res)=>{
+        const data=res.data();
+        console.log(data,slottxt[2]);
+        if(slottxt[2]=='s1'){
+            if(data[slottxt[2]]<limits[0]){
+                r(1);
+        }
+        else{
+            r(0)
+        }
+    }
+    if(slottxt[2]=='s2'){
+            if(data[slottxt[2]]<limits[1]){
+                r(1);
+        }
+        else{
+            r(0)
+        }
+    }
+    if(slottxt[2]=='s3'){
+            console.log('s333');
+            if(data[slottxt[2]]<limits[2]){
+                r(1);
+        }
+        else{
+            console.log('s111');
+            r(0);
+        }
+    }
+    if(slottxt[2]=='s4'){
+            if(data[slottxt[2]]<limits[3]){
+                r(1);
+        }
+        else{
+            r(0);
+        }
+    }
+    });
+    }
+)}
+
+
+function Alert(x,y){
+        const disAl = document.getElementById('al');
+        const disMain = document.getElementById('main');
+        if(y!=undefined){disAl.style.display = 'none';disMain.style.pointerEvents='all';disMain.style.opacity='1';
+        document.getElementById('cartcont').innerHTML="";return}
+        disAl.innerHTML=x+`<i class="fas fa-times" onclick="Alert(' ','cl')"></i>`;
+        disAl.style.display = 'flex';
+        disMain.style.pointerEvents='none';
+        disMain.style.opacity='0.6';
+}
+
+
+
+
+function validate(){
+            nam=document.getElementById('usn').value;
+             mail=document.getElementById('mail').value;
+             ph=document.getElementById('ph').value;
+             //console.log(mail.charAt(mail.lastIndexOf("@")-9),'dd');
+             if((nam==="" || mail==="")|| (ph==="")){
+                 Alert("Please fill the Contact Details!!");
+                 return;
+             }
+             else if(totpg==0){
+                     Alert("Cannot Proceed without Files!!");
+                     return;
+                 }
+             else if(mail.indexOf('@citchennai.net')==-1){
+                 Alert('Please use only valid clg mail id!!');
+                 return;
+             }
+             else if( ph.length!=10){
+                Alert("Please use only valid mobile number!!");
+             }
+             else{
+                 takeord();
+             }
+}
+
+
+
+
+async function takeord(){
+       document.getElementById("loadingOverlay").style.display="flex";
+       const arr=await nextdate();
+       console.log(arr);
+       document.getElementById("loadingOverlay").style.display="none";
+       //console.log(arr1,"here");
+       const modal=document.getElementById('al');
+       if(arr==1){
+       modal.innerHTML=`
+    <ol class="list-group list-group mb-3 w-100 bg" style="background-color:#1D2026;">
+       <li class="list-group-item"><h5 class='text-center'>Invoice</h5></li>
+       <li class="list-group-item"><div class="d-flex"><span>Receival date</span><span class='text-primary'>${slottxt[0]},${slottxt[1]}</span></div></li>
+       <li class="list-group-item"><div class="d-flex"><span>Name</span><span>${nam}</span></div></li>
+       <li class="list-group-item"><div class="d-flex"><span>Mob no:</span><span>${ph}</span></div></li>
+       <li class="list-group-item"><div class="d-flex"><span>Total payable</span><span class='text-primary'>₹${totpr-dis}</span></div></li>
+       <li class="list-group-item" id="invoicebt"><div class="d-flex"><button type="button" class="btn btn-outline-info" onclick="Alert(' ','cl')">Cancel</button>
+           <button type="button" class="btn btn-info" onclick="fillOrdData()">Proceed</button>
+   </div></li>
+   </ol>`;
+       modal.style.display='flex';
+       document.getElementById('cent').style.top="0%";
+       document.getElementById("cartcont").innerHTML=cartcont;
+   }
+   else{
+    var strm=`  
+    <ol class="list-group list-group mb-3 w-100">`;
+        strm=strm+`<li class="list-group-item"><h4 class='text-center'>Selected slot is full rightnow,Please try other slots!!</h4></li></ol>`;
+       modal.innerHTML=strm;
+       manager('stat');
+       setTimeout(() => {
+        modal.style.display="none";
+       },2500);
+    }
+       modal.style.display='flex';
+
+}
+   
+function downloadinvoice(){
+    document.getElementById('titt').innerHTML=`<h6>Midway Services</h6>`;
+    document.getElementById('id').innerHTML=`<h1>Ord No: ${ordData['id']}</h1>`;
+    var content = document.getElementById('cent');
+    document.getElementById('qr').style.display='block';
+    html2canvas(content).then(function(canvas){
+      var imgData = canvas.toDataURL("image/png");
+
+      // Create an anchor tag
+      var downloadLink = document.createElement("a");
+      downloadLink.href = imgData;
+      downloadLink.download = "Invoice"+ordData['id']+".png";
+      downloadLink.click();
+    if(ordData['c'].length!=0){
+    document.getElementById('cent').innerHTML=` 
+    <div class="container" style="background-color:#1D2026;color:white">       
+    <h3 class='text-primary text-danger'>One more step to finish the order</h3>
+    <h5>Ord Id: <span class="text-primary">${ordData['id']}</span></h5>
+    <span class="h6">As your order contains custom files,you need to send there sources to us!!</span>
+    <br>
+    <br>
+    <button onclick='createZip()' class='btn btn-primary'>Continue</button>
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><div>`;
+    }
+    else{
+        finalpg();
+    }
+      document.getElementById('loadingOverlay').style.display="none";
+      document.getElementById('loadingOverlay').style.background="rgba(255,255,255,0.1)";
+    });
+}
+
+function finalpg(){
+    document.getElementById('cent').innerHTML=` 
+    <div class="container mt-2" style="background-color:#1D2026;color:white">       
+    <h3 class='text-primary'>Order Placed Successfully</h3>
+    <br>
+    <h5>Ord Id: <span class="text-primary">${ordData['id']}</span></h5>
+    <br>
+    <h4>Payment Steps</h4>
+    <span class="h6">Pay the amount to the QR code in the invoice downloaded using Scan from Gallery option in your UPI app (Gpay/Phonepe/Paytm etc)</span>
+    <br>
+    <br>
+    <br>
+    <h6  style="font-weight: bolder;">Note:<br><br>
+    <span class='text-info'>Ever slots payment time ends before 45-60 mins of the slot,so please kindly do the payment before that,</span>so only we can take printouts as soon as possible<br><br>
+    <br>Please do not pay any extra amounts then the bill<br>
+    <br>Your order will not be taken if not paid<br>
+    <br>If any payment issues <a href="https://sites.google.com/citchennai.net/contactmidway/home">Contact Us</a></h6>
+    <br>
+    <br>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeCz5WsAOVjLoad6XvZmblTV_T1hVHfTqCfkBx4zzJHZ-FIug/viewform?usp=sf_link" class='btn btn-primary'>FeedBack</a>
+    <br><br><br><br><br><br><br><br><div>`
+}
+
+
+
+function generateQR(){
+    if(ordData['l'].length>5){
+      document.getElementById('cartcont').style.maxHeight="25vh";
+      document.getElementById('cartcont').style.paddingLeft="0px";
+    }
+    document.getElementById('bot').innerHTML="";
+    const idd=ordData['id'].split('-')[1];
+      var qrcode = new QRCode(document.getElementById('qr'),`upi://pay?pa=${upi}&pn=Midway%20Services&tn=OrdEK${idd}&am=${totpr-dis}.00&cu=INR`);
+}
+
+function Ddownload(){
+  generateQR();
+  downloadinvoice();
+}
+
+
+
+
+async function placeord(uol,sox){
+       document.getElementById('loadingOverlay').style.display="flex";
+       document.getElementById('loadingOverlay').style.background="#1D2026";
+        if(uol==undefined&& sox==undefined){
+         var orno=await getOrdid();
+         ordData['id']="EK-"+orno;
+        }
+         console.log(ordData['id']);
+        var batch=db.batch();
+        //console.log(data);
+        var orde=db.collection('orders').doc(slottxt[0]);
+        if(uol==undefined){
+        batch.update(orde,{[''+slottxt[2]]:(firebase.firestore.FieldValue.arrayUnion(ordData))});
+        }
+        else{
+            batch.set(orde,{[''+slottxt[2]]:[ordData]});  
+        }
+        if(sox!='redo'){
+        batch.commit().then(()=>{                   
+            console.log("done");
+            if(document.getElementById('invoicebt')!=undefined && document.getElementById('invoicebt')!=null){
+            document.getElementById('invoicebt').remove();}
+            document.getElementById('instruct').style.display="block";
+            Ddownload();
+        }).catch((err)=>{
+            console.log(err.message);
+            if(err.message.indexOf('No document')!=-1){
+                placeord('redo',undefined);
+                return;
+            }
+            const modal=document.getElementById('al');
+            //console.log("err");
+            document.getElementById('loadingOverlay').style.display="none";
+            modal.innerHTML=`
+            <h5 class='text-danger'>Order didn't placed please try again later!!</h5>`;
+        
+        });
+    }
+        if(sox==undefined){
+            if(uol!='redo'){
+        await udb.collection('users').doc(slottxt[0]).update({[''+slottxt[2]]:firebase.firestore.FieldValue.arrayUnion({id:ordData['id'],em:mail,ph:ph,n:nam})}).then(()=>{})
+        .catch((err)=>{
+               if(err.message.indexOf('No document')!=-1){
+                placeord(undefined,'redo');
+                return;
+            }});}
+        }
+        else{
+            await udb.collection('users').doc(slottxt[0]).set({[''+slottxt[2]]:[{id:ordData['id'],em:mail,ph:ph,n:nam}]});
+        }
+    }
+
+
+function getOrdid(){
+    var no;
+    return new Promise((r,rj)=>{
+    console.log("getting id");
+    db.runTransaction(transaction => {
+        return transaction.get(db.collection('spList').doc("spd")).then(doc =>{
+    if (!doc.exists) {
+      throw new Error('Document does not exist!');
+    }
+
+     currentValue = doc.data()['ord'];
+
+    incrementedValue = currentValue + 1;
+    no=incrementedValue;
+    transaction.update(db.collection('spList').doc("spd"), {ord: incrementedValue});
+}).then(() => {
+    setTimeout(()=>{
+        r(no);
+    },1000);
+})
+})
+});
+}
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
